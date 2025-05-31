@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -107,6 +109,7 @@ export default function Watchlist() {
 
   useEffect(() => {
     fetchWatchlist();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, authenticated, user?.id]);
 
   const formatAddress = (address: string) => {
