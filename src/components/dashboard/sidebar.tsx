@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { packBattlesABI } from '../../lib/abis/PackBattles';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x52b68B2576d3D4bc1eDC63cF36dB1B1BDCCc4F80';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home, description: 'Main dashboard' },

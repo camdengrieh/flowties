@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Loader2, Trophy, Clock, ArrowLeft, User, Users } from 'lucide-react';
+import { Sparkles, Loader2, Trophy, Clock, ArrowLeft, User, Users, Play } from 'lucide-react';
 import { useReadContract, useAccount } from 'wagmi';
 import { packBattlesABI } from '@/lib/abis/PackBattles';
 import DynamicBattleStage from './dynamic-battle-stage';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x52b68B2576d3D4bc1eDC63cF36dB1B1BDCCc4F80';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
 
 interface Card {
   id: string;
@@ -42,6 +42,7 @@ export default function GameDetail({ gameId }: GameDetailProps) {
   const [payload, setPayload] = useState<BattlePayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showReplay, setShowReplay] = useState(false);
 
   const gameIdNumber = parseInt(gameId);
 
@@ -90,7 +91,11 @@ export default function GameDetail({ gameId }: GameDetailProps) {
   }, [game]);
 
   const handleReset = () => {
-    router.push('/battles');
+    setShowReplay(false);
+  };
+
+  const handleReplayClick = () => {
+    setShowReplay(true);
   };
 
   if (isLoadingGame) {
@@ -134,26 +139,36 @@ export default function GameDetail({ gameId }: GameDetailProps) {
 
   const winner = getWinner();
 
-  // If game is completed and we have payload, show battle results
-  if (game.isCompleted && payload) {
+  // If user clicked replay and we have payload, show battle results
+  if (showReplay && payload) {
     return (
       <div className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
+          {/* Header with Breadcrumb */}
           <div className="mb-8 text-center">
-            <button
-              onClick={() => router.push('/battles')}
-              className="mb-4 bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2 mx-auto"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Battles
-            </button>
+            <div className="flex items-center justify-center gap-2 mb-4 text-sm text-gray-400">
+              <button
+                onClick={() => router.push('/battles')}
+                className="hover:text-white transition-colors"
+              >
+                Battles
+              </button>
+              <span>/</span>
+              <button
+                onClick={() => setShowReplay(false)}
+                className="hover:text-white transition-colors"
+              >
+                Game #{gameId}
+              </button>
+              <span>/</span>
+              <span className="text-orange-400">Battle Replay</span>
+            </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 bg-clip-text text-transparent mb-2 flex items-center gap-2 justify-center">
               <Sparkles className="text-orange-400" />
-              Game #{gameId} - Battle Results
+              Game #{gameId} - Battle Replay
               <Sparkles className="text-orange-400" />
             </h1>
-            <p className="text-gray-400">Battle completed!</p>
+            <p className="text-gray-400">Watch the epic battle unfold!</p>
           </div>
 
           {/* Battle Stage */}
@@ -292,6 +307,23 @@ export default function GameDetail({ gameId }: GameDetailProps) {
               </div>
             </div>
           </div>
+
+          {/* Replay Button for Completed Games */}
+          {game.isCompleted && payload && !loading && (
+            <div className="text-center">
+              <button
+                onClick={handleReplayClick}
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg"
+              >
+                <Play className="w-6 h-6" />
+                <span className="text-lg">Watch Battle Replay</span>
+                <Sparkles className="w-6 h-6" />
+              </button>
+              <p className="text-gray-400 mt-3">
+                See how the battle unfolded between the cards!
+              </p>
+            </div>
+          )}
 
           {/* Pending Animation */}
           {!game.isCompleted && (
