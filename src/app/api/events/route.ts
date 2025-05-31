@@ -1,7 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Type definitions for API responses
-interface Sale {
+interface Event {
+  id: string;
+  type: 'sale' | 'listing' | 'delisting';
+  collection?: {
+    address: string;
+    name: string;
+    image: string;
+  };
+  tokenId?: string;
+  seller?: string;
+  buyer?: string;
+  price?: string;
+  currency?: string;
+  platform?: string;
+  timestamp: number;
+  txHash: string;
+  blockNumber: string | number;
+}
+
+interface EventsResponse {
+  events: Event[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+  filters: {
+    eventType?: string;
+    collection?: string;
+    userAddress?: string;
+    timeRange: string;
+  };
+  error?: string;
+}
+
+interface CollectionData {
+  id: string;
+  name: string;
+  symbol: string;
+  totalVolume: string;
+  owners: number;
+}
+
+interface SaleData {
   id: string;
   collection: string;
   tokenId: string;
@@ -14,7 +57,7 @@ interface Sale {
   blockNumber: string;
 }
 
-interface Offer {
+interface OfferData {
   id: string;
   collection: string;
   tokenId: string;
@@ -26,138 +69,171 @@ interface Offer {
   blockNumber: string;
 }
 
-interface Cancellation {
+interface CancellationData {
   id: string;
   offerer: string;
   timestamp: number;
   blockNumber: string;
 }
 
-interface Collection {
-  id: string;
-  name: string;
-  symbol: string;
-}
-
-interface Event {
-  id: string;
-  type: 'sale' | 'listing' | 'delisting';
-  collection?: string;
-  tokenId?: string;
-  seller?: string;
-  buyer?: string;
-  price?: string;
-  currency?: string;
-  platform?: string;
-  timestamp: number;
-  txHash: string;
-  blockNumber: string | number;
-}
-
-// GraphQL query for fetching events from Ponder
-const EVENTS_QUERY = `
-  query GetEvents($timeFilter: Int!, $limit: Int!, $offset: Int!) {
-    sales(
-      where: { timestamp_gte: $timeFilter }
-      orderBy: timestamp
-      orderDirection: desc
-      first: $limit
-      skip: $offset
-    ) {
-      id
-      collection
-      tokenId
-      seller
-      buyer
-      price
-      currency
-      platform
-      timestamp
-      blockNumber
-    }
-    offers(
-      where: { 
-        timestamp_gte: $timeFilter
-        status: "active"
-      }
-      orderBy: timestamp
-      orderDirection: desc
-      first: $limit
-      skip: $offset
-    ) {
-      id
-      collection
-      tokenId
-      offerer
-      price
-      currency
-      platform
-      timestamp
-      blockNumber
-    }
-    cancellations(
-      where: { timestamp_gte: $timeFilter }
-      orderBy: timestamp
-      orderDirection: desc
-      first: $limit
-      skip: $offset
-    ) {
-      id
-      offerer
-      timestamp
-      blockNumber
-    }
-    collections {
-      id
-      name
-      symbol
-    }
-  }
-`;
-
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const eventType = searchParams.get('eventType');
-    const collection = searchParams.get('collection');
-    const userAddress = searchParams.get('userAddress');
-    const timeRange = searchParams.get('timeRange') || '24h';
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
+  const eventType = searchParams.get('eventType');
+  const collection = searchParams.get('collection');
+  const userAddress = searchParams.get('userAddress');
+  const timeRange = searchParams.get('timeRange') || '24h';
 
-    // Calculate time range filter
+  try {
+    // Calculate time filter
     const now = Math.floor(Date.now() / 1000);
-    let timeRangeSeconds = 24 * 60 * 60; // 24h default
+    let timestampFilter = 0;
     
     switch (timeRange) {
-      case '1h': timeRangeSeconds = 60 * 60; break;
-      case '6h': timeRangeSeconds = 6 * 60 * 60; break;
-      case '24h': timeRangeSeconds = 24 * 60 * 60; break;
-      case '7d': timeRangeSeconds = 7 * 24 * 60 * 60; break;
-      case '30d': timeRangeSeconds = 30 * 24 * 60 * 60; break;
+      case '1h':
+        timestampFilter = now - 3600;
+        break;
+      case '6h':
+        timestampFilter = now - 21600;
+        break;
+      case '24h':
+        timestampFilter = now - 86400;
+        break;
+      case '7d':
+        timestampFilter = now - 604800;
+        break;
+      case '30d':
+        timestampFilter = now - 2592000;
+        break;
+      default:
+        timestampFilter = now - 86400;
     }
 
-    const timeFilter = now - timeRangeSeconds;
-    const offset = (page - 1) * limit;
+    const skip = (page - 1) * limit;
 
-    // Query Ponder GraphQL endpoint
+    // Build GraphQL query using correct Ponder syntax
+    let salesQuery = '';
+    let offersQuery = '';
+    let cancellationsQuery = '';
+
+    // Sales (completed transactions)
+    if (!eventType || eventType === 'sale') {
+      salesQuery = `
+        sales(
+          limit: ${limit}
+          offset: ${skip}
+          orderBy: "timestamp"
+          orderDirection: "desc"
+          where: { 
+            timestamp: { gte: ${timestampFilter} }
+            ${collection ? `collection: "${collection}"` : ''}
+            ${userAddress ? `or: [{ seller: "${userAddress}" }, { buyer: "${userAddress}" }]` : ''}
+          }
+        ) {
+          items {
+            id
+            collection
+            tokenId
+            seller
+            buyer
+            price
+            currency
+            platform
+            timestamp
+            blockNumber
+          }
+        }
+      `;
+    }
+
+    // Offers/Listings
+    if (!eventType || eventType === 'listing') {
+      offersQuery = `
+        offers(
+          limit: ${limit}
+          offset: ${skip}
+          orderBy: "timestamp"
+          orderDirection: "desc"
+          where: { 
+            timestamp: { gte: ${timestampFilter} }
+            status: "active"
+            ${collection ? `collection: "${collection}"` : ''}
+            ${userAddress ? `offerer: "${userAddress}"` : ''}
+          }
+        ) {
+          items {
+            id
+            collection
+            tokenId
+            offerer
+            price
+            currency
+            platform
+            timestamp
+            blockNumber
+          }
+        }
+      `;
+    }
+
+    // Cancellations (delistings)
+    if (!eventType || eventType === 'delisting') {
+      cancellationsQuery = `
+        cancellations(
+          limit: ${limit}
+          offset: ${skip}
+          orderBy: "timestamp"
+          orderDirection: "desc"
+          where: { 
+            timestamp: { gte: ${timestampFilter} }
+            ${userAddress ? `offerer: "${userAddress}"` : ''}
+          }
+        ) {
+          items {
+            id
+            offerer
+            timestamp
+            blockNumber
+          }
+        }
+      `;
+    }
+
+    // Get collection metadata
+    const collectionsQuery = `
+      collections {
+        items {
+          id
+          name
+          symbol
+          totalVolume
+          owners
+        }
+      }
+    `;
+
+    const query = `
+      query GetEvents {
+        ${salesQuery}
+        ${offersQuery}
+        ${cancellationsQuery}
+        ${collectionsQuery}
+      }
+    `;
+
+    console.log('Executing Ponder GraphQL query:', query);
+
     const ponderResponse = await fetch('http://localhost:42070/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        query: EVENTS_QUERY,
-        variables: {
-          timeFilter,
-          limit,
-          offset
-        }
-      })
+      body: JSON.stringify({ query })
     });
 
     if (!ponderResponse.ok) {
-      throw new Error(`Ponder request failed: ${ponderResponse.status}`);
+      throw new Error(`Ponder API returned ${ponderResponse.status}`);
     }
 
     const ponderData = await ponderResponse.json();
@@ -167,120 +243,124 @@ export async function GET(request: NextRequest) {
       throw new Error('Ponder GraphQL query failed');
     }
 
-    let events: Event[] = [];
+    const events: Event[] = [];
+    const collections: CollectionData[] = ponderData.data.collections?.items || [];
+    
+    // Create collection map for metadata lookup
+    const collectionMap = new Map(
+      collections.map((c: CollectionData) => [
+        c.id, 
+        { 
+          address: c.id, 
+          name: c.name || 'Unknown Collection',
+          image: 'https://via.placeholder.com/64' // Placeholder - can be enriched with readContract
+        }
+      ])
+    );
 
-    // Process sales events
-    if (!eventType || eventType === 'sale') {
-      const sales = ponderData.data.sales || [];
-      events.push(...sales.map((sale: Sale) => ({
-        ...sale,
+    // Process sales
+    if (ponderData.data.sales?.items) {
+      const salesEvents = ponderData.data.sales.items.map((sale: SaleData) => ({
+        id: sale.id,
         type: 'sale' as const,
+        collection: collectionMap.get(sale.collection),
+        tokenId: sale.tokenId,
+        seller: sale.seller,
+        buyer: sale.buyer,
+        price: sale.price,
+        currency: sale.currency,
+        platform: sale.platform || 'FlowtyMarketplace',
+        timestamp: sale.timestamp,
         txHash: sale.id.split('-')[0], // Extract tx hash from id
-      })));
+        blockNumber: sale.blockNumber
+      }));
+      events.push(...salesEvents);
     }
 
-    // Process listing events (from offers)
-    if (!eventType || eventType === 'listing') {
-      const offers = ponderData.data.offers || [];
-      events.push(...offers.map((offer: Offer) => ({
+    // Process listings (offers)
+    if (ponderData.data.offers?.items) {
+      const listingEvents = ponderData.data.offers.items.map((offer: OfferData) => ({
         id: offer.id,
         type: 'listing' as const,
-        collection: offer.collection,
+        collection: collectionMap.get(offer.collection),
         tokenId: offer.tokenId,
         seller: offer.offerer,
+        buyer: undefined,
         price: offer.price,
         currency: offer.currency,
-        platform: offer.platform,
+        platform: offer.platform || 'FlowtyMarketplace',
         timestamp: offer.timestamp,
-        txHash: offer.id.split('-')[0], // Extract tx hash from id
-        blockNumber: offer.blockNumber,
-      })));
+        txHash: offer.id.split('-')[0],
+        blockNumber: offer.blockNumber
+      }));
+      events.push(...listingEvents);
     }
 
-    // Process delisting events (from cancellations)
-    if (!eventType || eventType === 'delisting') {
-      const cancellations = ponderData.data.cancellations || [];
-      events.push(...cancellations.map((cancellation: Cancellation) => ({
+    // Process cancellations (delistings)
+    if (ponderData.data.cancellations?.items) {
+      const cancellationEvents = ponderData.data.cancellations.items.map((cancellation: CancellationData) => ({
         id: cancellation.id,
         type: 'delisting' as const,
+        collection: undefined,
+        tokenId: undefined,
         seller: cancellation.offerer,
+        buyer: undefined,
+        price: undefined,
+        currency: undefined,
+        platform: 'FlowtyMarketplace',
         timestamp: cancellation.timestamp,
-        txHash: cancellation.id.split('-')[0], // Extract tx hash from id
-        blockNumber: cancellation.blockNumber,
-      })));
+        txHash: cancellation.id.split('-')[0],
+        blockNumber: cancellation.blockNumber
+      }));
+      events.push(...cancellationEvents);
     }
 
-    // Apply additional filters
-    if (collection) {
-      events = events.filter(event => 
-        event.collection && (
-          event.collection.toLowerCase().includes(collection.toLowerCase()) ||
-          event.collection === collection
-        )
-      );
-    }
-
-    if (userAddress) {
-      events = events.filter(event => 
-        (event.seller && event.seller.toLowerCase() === userAddress.toLowerCase()) ||
-        (event.buyer && event.buyer.toLowerCase() === userAddress.toLowerCase()) ||
-        (event.seller && event.seller.toLowerCase() === userAddress.toLowerCase()) // offerer mapped to seller
-      );
-    }
-
-    // Sort all events by timestamp and apply pagination
+    // Sort events by timestamp (most recent first)
     events.sort((a, b) => b.timestamp - a.timestamp);
+
+    // Paginate results
+    const totalEvents = events.length;
     const paginatedEvents = events.slice(0, limit);
 
-    // Enrich events with collection metadata
-    const collections = ponderData.data.collections || [];
-    const enrichedEvents = paginatedEvents.map(event => {
-      const collectionData = collections.find((c: Collection) => c.id === event.collection);
-      return {
-        ...event,
-        collection: event.collection ? {
-          address: event.collection,
-          name: collectionData?.name || 'Unknown Collection',
-          image: 'https://via.placeholder.com/64' // You'd fetch this from IPFS/metadata
-        } : undefined
-      };
-    });
-
-    return NextResponse.json({
-      events: enrichedEvents,
+    const response: EventsResponse = {
+      events: paginatedEvents,
       pagination: {
         page,
         limit,
-        total: events.length,
-        hasMore: events.length >= limit
+        total: totalEvents,
+        hasMore: totalEvents > page * limit
       },
       filters: {
-        eventType,
-        collection,
-        userAddress,
+        eventType: eventType || undefined,
+        collection: collection || undefined,
+        userAddress: userAddress || undefined,
         timeRange
       }
-    });
+    };
+
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('Events API error:', error);
     
-    // Fallback to empty data if Ponder is not available
-    return NextResponse.json({
+    // Return empty results on error instead of failing
+    const fallbackResponse: EventsResponse = {
       events: [],
       pagination: {
-        page: parseInt(new URL(request.url).searchParams.get('page') || '1'),
-        limit: parseInt(new URL(request.url).searchParams.get('limit') || '20'),
+        page,
+        limit,
         total: 0,
         hasMore: false
       },
       filters: {
-        eventType: new URL(request.url).searchParams.get('eventType'),
-        collection: new URL(request.url).searchParams.get('collection'),
-        userAddress: new URL(request.url).searchParams.get('userAddress'),
-        timeRange: new URL(request.url).searchParams.get('timeRange') || '24h'
+        eventType: eventType || undefined,
+        collection: collection || undefined,
+        userAddress: userAddress || undefined,
+        timeRange
       },
-      error: 'Ponder backend not available - showing empty results'
-    });
+      error: 'Failed to fetch events from blockchain indexer'
+    };
+
+    return NextResponse.json(fallbackResponse);
   }
 } 

@@ -6,7 +6,7 @@ import { Bell, Check, ExternalLink, Filter } from 'lucide-react';
 
 interface Notification {
   id: string;
-  userAddress: string;
+  userPrivyId: string;
   type: 'sale_completed' | 'volume_surge' | 'offer_received' | 'user_activity';
   title: string;
   message: string;
@@ -25,7 +25,7 @@ interface NotificationsResponse {
 }
 
 export default function Notifications() {
-  const { user } = usePrivy();
+  const { ready, authenticated, user } = usePrivy();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -33,11 +33,14 @@ export default function Notifications() {
   const [selectedType, setSelectedType] = useState<string>('all');
 
   const fetchNotifications = async () => {
-    if (!user?.wallet?.address) return;
+    if (!ready || !authenticated || !user?.id) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const params = new URLSearchParams({
-        address: user.wallet.address,
+        privyId: user.id,
         limit: '50',
         ...(filter === 'unread' && { unread: 'true' })
       });
@@ -55,11 +58,17 @@ export default function Notifications() {
   };
 
   const markAsRead = async (notificationId: string) => {
+    if (!user?.id) return;
+
     try {
       await fetch('/api/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notificationId, markAsRead: true })
+        body: JSON.stringify({ 
+          notificationId, 
+          markAsRead: true,
+          privyId: user.id
+        })
       });
 
       setNotifications(prev => 
@@ -72,13 +81,13 @@ export default function Notifications() {
   };
 
   const markAllAsRead = async () => {
-    if (!user?.wallet?.address) return;
+    if (!user?.id) return;
 
     try {
       await fetch('/api/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userAddress: user.wallet.address })
+        body: JSON.stringify({ privyId: user.id })
       });
 
       setNotifications(prev => 
@@ -93,7 +102,7 @@ export default function Notifications() {
   useEffect(() => {
     fetchNotifications();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.wallet?.address, filter]);
+  }, [ready, authenticated, user?.id, filter]);
 
   const formatTime = (timestamp: number) => {
     const now = Date.now() / 1000;
@@ -129,6 +138,35 @@ export default function Notifications() {
     if (selectedType === 'all') return true;
     return n.type === selectedType;
   });
+
+  // Show loading state while Privy is initializing
+  if (!ready) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-sm border">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-300 rounded mb-4 w-1/3"></div>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-16 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!authenticated) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-sm border">
+        <div className="text-center py-8">
+          <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500 mb-2">Please log in to view notifications</p>
+          <p className="text-sm text-gray-400">Connect your wallet or sign in to get started</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -204,6 +242,9 @@ export default function Notifications() {
           <div className="p-8 text-center">
             <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">No notifications found</p>
+            <p className="text-sm text-gray-400 mt-1">
+              When you start using the platform, notifications will appear here
+            </p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">

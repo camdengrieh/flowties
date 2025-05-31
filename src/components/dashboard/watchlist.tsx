@@ -6,7 +6,7 @@ import { Plus, Trash2, Users, Image, Wallet, Bell } from 'lucide-react';
 
 interface WatchlistItem {
   id: string;
-  userAddress: string;
+  userPrivyId: string;
   type: 'collection' | 'user' | 'nft';
   target: string;
   metadata?: {
@@ -35,7 +35,7 @@ interface WatchlistData {
 }
 
 export default function Watchlist() {
-  const { user } = usePrivy();
+  const { ready, authenticated, user } = usePrivy();
   const [watchlistData, setWatchlistData] = useState<WatchlistData>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'collections' | 'users' | 'nfts'>('collections');
@@ -44,10 +44,13 @@ export default function Watchlist() {
   const [newItemType, setNewItemType] = useState<'collection' | 'user' | 'nft'>('collection');
 
   const fetchWatchlist = async () => {
-    if (!user?.wallet?.address) return;
+    if (!ready || !authenticated || !user?.id) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await fetch(`/api/watchlist?address=${user.wallet.address}&type=all`);
+      const response = await fetch(`/api/watchlist?privyId=${user.id}&type=all`);
       const data: WatchlistData = await response.json();
       setWatchlistData(data);
     } catch (error) {
@@ -58,14 +61,14 @@ export default function Watchlist() {
   };
 
   const addToWatchlist = async () => {
-    if (!user?.wallet?.address || !newItemAddress.trim()) return;
+    if (!user?.id || !newItemAddress.trim()) return;
 
     try {
       const response = await fetch('/api/watchlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userAddress: user.wallet.address,
+          privyId: user.id,
           type: newItemType,
           target: newItemType === 'nft' ? `${newItemAddress.split('-')[0]}-${newItemAddress.split('-')[1] || '1'}` : newItemAddress,
           notifications: {
@@ -87,8 +90,10 @@ export default function Watchlist() {
   };
 
   const removeFromWatchlist = async (itemId: string) => {
+    if (!user?.id) return;
+
     try {
-      const response = await fetch(`/api/watchlist?id=${itemId}`, {
+      const response = await fetch(`/api/watchlist?id=${itemId}&privyId=${user.id}`, {
         method: 'DELETE'
       });
 
@@ -102,7 +107,7 @@ export default function Watchlist() {
 
   useEffect(() => {
     fetchWatchlist();
-  }, [user?.wallet?.address]);
+  }, [ready, authenticated, user?.id]);
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 8)}...${address.slice(-6)}`;
@@ -134,6 +139,43 @@ export default function Watchlist() {
   };
 
   const currentItems = watchlistData[activeTab] || [];
+
+  // Show loading state while Privy is initializing
+  if (!ready) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-sm border">
+        <div className="animate-pulse">
+          <div className="h-6 bg-gray-300 rounded mb-4 w-1/3"></div>
+          <div className="flex gap-4 mb-6">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-10 bg-gray-200 rounded w-24"></div>
+            ))}
+          </div>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!authenticated) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Watchlist</h2>
+        </div>
+        <div className="p-8 text-center">
+          <Wallet className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500 mb-2">Please log in to view your watchlist</p>
+          <p className="text-sm text-gray-400">Connect your wallet or sign in to get started</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

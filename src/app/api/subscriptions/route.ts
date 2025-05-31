@@ -1,51 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // This would connect to your Ponder backend database in production
-// For demo purposes, we'll return mock data
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const userAddress = searchParams.get('address');
+  const privyId = searchParams.get('privyId');
 
-  if (!userAddress) {
-    return NextResponse.json({ error: 'Address parameter required' }, { status: 400 });
+  if (!privyId) {
+    return NextResponse.json({ error: 'Privy ID parameter required' }, { status: 400 });
   }
 
-  // Mock user subscriptions - in production this would query your Ponder database
-  const subscriptions = [
-    {
-      id: `${userAddress}-offers_received-null`,
-      userAddress,
-      subscriptionType: 'offers_received',
-      target: null,
-      isActive: true,
-      enableInApp: true,
-      enableSms: false,
-      enableTelegram: false,
-      createdAt: Date.now() / 1000,
-    },
-    {
-      id: `${userAddress}-sales_completed-null`,
-      userAddress,
-      subscriptionType: 'sales_completed', 
-      target: null,
-      isActive: true,
-      enableInApp: true,
-      enableSms: true,
-      enableTelegram: false,
-      smsNumber: '+1234567890',
-      createdAt: Date.now() / 1000,
-    }
-  ];
+  try {
+    // In production, query your Ponder database:
+    // SELECT * FROM UserSubscription WHERE userPrivyId = $1
 
-  return NextResponse.json({ subscriptions });
+    console.log('Fetching subscriptions for user:', privyId);
+
+    // For now, return empty subscriptions until connected to real database
+    const subscriptions: unknown[] = [];
+
+    return NextResponse.json({ subscriptions });
+
+  } catch (error) {
+    console.error('Failed to fetch subscriptions:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch subscriptions' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { 
-      userAddress, 
+      privyId, 
       subscriptionType, 
       target, 
       enableInApp = true, 
@@ -55,9 +44,9 @@ export async function POST(request: NextRequest) {
       telegramChatId 
     } = body;
 
-    if (!userAddress || !subscriptionType) {
+    if (!privyId || !subscriptionType) {
       return NextResponse.json(
-        { error: 'userAddress and subscriptionType are required' }, 
+        { error: 'privyId and subscriptionType are required' }, 
         { status: 400 }
       );
     }
@@ -71,25 +60,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In production, this would insert into your Ponder database
-    const subscription = {
-      id: `${userAddress}-${subscriptionType}-${target || 'null'}`,
-      userAddress,
+    // In production, insert into your Ponder database:
+    // INSERT INTO UserSubscription (userPrivyId, subscriptionType, target, ...)
+    // VALUES ($1, $2, $3, ...)
+
+    console.log('Creating subscription:', {
+      privyId,
       subscriptionType,
       target,
-      isActive: true,
       enableInApp,
       enableSms,
       enableTelegram,
       smsNumber,
-      telegramChatId,
-      createdAt: Math.floor(Date.now() / 1000),
-      updatedAt: Math.floor(Date.now() / 1000),
-    };
+      telegramChatId
+    });
 
     return NextResponse.json({ 
       success: true, 
-      subscription,
       message: 'Subscription created successfully'
     });
 
@@ -105,14 +92,29 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const subscriptionId = searchParams.get('id');
+  const privyId = searchParams.get('privyId');
 
-  if (!subscriptionId) {
-    return NextResponse.json({ error: 'Subscription ID required' }, { status: 400 });
+  if (!subscriptionId || !privyId) {
+    return NextResponse.json({ error: 'Subscription ID and Privy ID required' }, { status: 400 });
   }
 
-  // In production, this would delete from your Ponder database
-  return NextResponse.json({ 
-    success: true,
-    message: 'Subscription deleted successfully'
-  });
+  try {
+    // In production, delete from your Ponder database:
+    // DELETE FROM UserSubscription 
+    // WHERE id = $1 AND userPrivyId = $2
+
+    console.log('Deleting subscription:', { subscriptionId, privyId });
+
+    return NextResponse.json({ 
+      success: true,
+      message: 'Subscription deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Failed to delete subscription:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete subscription' },
+      { status: 500 }
+    );
+  }
 } 
