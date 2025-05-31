@@ -116,12 +116,12 @@ export default function SettingsPage() {
   if (!ready) {
     return (
       <DashboardLayout>
-        <div className="p-6 bg-white rounded-lg shadow-sm border">
+        <div className="p-6 bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
           <div className="animate-pulse">
-            <div className="h-6 bg-gray-300 rounded mb-4 w-1/3"></div>
+            <div className="h-6 bg-gray-700 rounded mb-4 w-1/3"></div>
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                <div key={i} className="h-16 bg-gray-800 rounded"></div>
               ))}
             </div>
           </div>
@@ -134,14 +134,14 @@ export default function SettingsPage() {
   if (!authenticated) {
     return (
       <DashboardLayout>
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">Notification Settings</h1>
+        <div className="bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
+          <div className="px-6 py-4 border-b border-red-900/30">
+            <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
           </div>
           <div className="p-8 text-center">
-            <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 mb-2">Please log in to access settings</p>
-            <p className="text-sm text-gray-400">Connect your wallet or sign in to get started</p>
+            <Bell className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-300 mb-2">Please log in to access settings</p>
+            <p className="text-sm text-gray-500">Connect your wallet or sign in to get started</p>
           </div>
         </div>
       </DashboardLayout>
@@ -151,12 +151,12 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <DashboardLayout>
-        <div className="p-6 bg-white rounded-lg shadow-sm border">
+        <div className="p-6 bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
           <div className="animate-pulse">
-            <div className="h-6 bg-gray-300 rounded mb-4 w-1/3"></div>
+            <div className="h-6 bg-gray-700 rounded mb-4 w-1/3"></div>
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                <div key={i} className="h-16 bg-gray-800 rounded"></div>
               ))}
             </div>
           </div>
@@ -170,63 +170,63 @@ export default function SettingsPage() {
       <div className="space-y-6">
         {/* Page Header */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Notification Settings</h1>
-          <p className="text-gray-600">Manage your notification preferences and channels.</p>
+          <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
+          <p className="text-gray-400">Manage your notification preferences and channels.</p>
         </div>
 
         {/* Notification Channels */}
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Notification Channels</h2>
-            <p className="text-sm text-gray-600">Configure how you want to receive notifications.</p>
+        <div className="bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
+          <div className="px-6 py-4 border-b border-red-900/30">
+            <h2 className="text-lg font-semibold text-white">Notification Channels</h2>
+            <p className="text-sm text-gray-400">Configure how you want to receive notifications.</p>
           </div>
           
           <div className="p-6 space-y-6">
             {/* In-App Notifications */}
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <Bell className="h-6 w-6 text-blue-600" />
+              <div className="p-3 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg">
+                <Bell className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900">In-App Notifications</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className="text-sm font-medium text-white">In-App Notifications</h3>
+                <p className="text-sm text-gray-400 mt-1">
                   Receive notifications directly in the dashboard.
                 </p>
                 <label className="flex items-center gap-2 mt-3">
                   <input
                     type="checkbox"
                     defaultChecked
-                    className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                    className="rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-offset-0"
                   />
-                  <span className="text-sm text-gray-700">Enable in-app notifications</span>
+                  <span className="text-sm text-gray-300">Enable in-app notifications</span>
                 </label>
               </div>
             </div>
 
             {/* SMS Notifications */}
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-green-50 rounded-lg">
-                <Phone className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-gradient-to-br from-green-600 to-green-500 rounded-lg">
+                <Phone className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900">SMS Notifications</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className="text-sm font-medium text-white">SMS Notifications</h3>
+                <p className="text-sm text-gray-400 mt-1">
                   Get important alerts via text message.
                 </p>
                 <div className="mt-3 space-y-3">
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                      className="rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-offset-0"
                     />
-                    <span className="text-sm text-gray-700">Enable SMS notifications</span>
+                    <span className="text-sm text-gray-300">Enable SMS notifications</span>
                   </label>
                   <input
                     type="tel"
                     value={smsNumber}
                     onChange={(e) => setSmsNumber(e.target.value)}
                     placeholder="+1 (555) 123-4567"
-                    className="block w-full max-w-xs text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full max-w-xs text-sm border border-gray-600 bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-500"
                   />
                 </div>
               </div>
@@ -234,28 +234,28 @@ export default function SettingsPage() {
 
             {/* Telegram Notifications */}
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <MessageCircle className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-gradient-to-br from-blue-600 to-blue-500 rounded-lg">
+                <MessageCircle className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-900">Telegram Notifications</h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <h3 className="text-sm font-medium text-white">Telegram Notifications</h3>
+                <p className="text-sm text-gray-400 mt-1">
                   Receive alerts via Telegram bot.
                 </p>
                 <div className="mt-3 space-y-3">
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                      className="rounded border-gray-600 bg-gray-800 text-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-offset-0"
                     />
-                    <span className="text-sm text-gray-700">Enable Telegram notifications</span>
+                    <span className="text-sm text-gray-300">Enable Telegram notifications</span>
                   </label>
                   <input
                     type="text"
                     value={telegramChatId}
                     onChange={(e) => setTelegramChatId(e.target.value)}
                     placeholder="Your Telegram Chat ID"
-                    className="block w-full max-w-xs text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full max-w-xs text-sm border border-gray-600 bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-500"
                   />
                   <p className="text-xs text-gray-500">
                     Start a chat with our bot @FlowNotificationBot to get your Chat ID
@@ -267,21 +267,21 @@ export default function SettingsPage() {
         </div>
 
         {/* Subscription Management */}
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Active Subscriptions</h2>
-            <p className="text-sm text-gray-600">Manage what types of events trigger notifications.</p>
+        <div className="bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
+          <div className="px-6 py-4 border-b border-red-900/30">
+            <h2 className="text-lg font-semibold text-white">Active Subscriptions</h2>
+            <p className="text-sm text-gray-400">Manage what types of events trigger notifications.</p>
           </div>
           
           <div className="p-6">
             {/* Add New Subscription */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Add New Subscription</h3>
+            <div className="mb-6 p-4 bg-gradient-to-br from-gray-800 to-red-900/20 rounded-lg border border-gray-700/50">
+              <h3 className="text-sm font-medium text-white mb-3">Add New Subscription</h3>
               <div className="flex items-center gap-4">
                 <select
                   value={newSubscription.type}
                   onChange={(e) => setNewSubscription({ ...newSubscription, type: e.target.value })}
-                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="border border-gray-600 bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value="offers_received">Offers Received</option>
                   <option value="sales_completed">Sales Completed</option>
@@ -294,12 +294,12 @@ export default function SettingsPage() {
                   value={newSubscription.target}
                   onChange={(e) => setNewSubscription({ ...newSubscription, target: e.target.value })}
                   placeholder="Target address (optional)"
-                  className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 border border-gray-600 bg-gray-800 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 placeholder-gray-500"
                 />
 
                 <button
                   onClick={addSubscription}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-600 via-orange-600 to-red-600 hover:from-red-700 hover:via-orange-700 hover:to-red-700 text-white rounded transition-all duration-300"
                 >
                   <Plus className="h-4 w-4" />
                   Add
@@ -310,40 +310,40 @@ export default function SettingsPage() {
             {/* Existing Subscriptions */}
             <div className="space-y-3">
               {subscriptions.map((subscription) => (
-                <div key={subscription.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div key={subscription.id} className="flex items-center justify-between p-4 border border-gray-700/50 bg-gradient-to-br from-gray-800 to-red-900/20 rounded-lg">
                   <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900 capitalize">
+                    <h4 className="text-sm font-medium text-white capitalize">
                       {subscription.subscriptionType.replace('_', ' ')}
                     </h4>
                     {subscription.target && (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-400">
                         Target: {subscription.target.slice(0, 8)}...{subscription.target.slice(-6)}
                       </p>
                     )}
                     <div className="flex items-center gap-4 mt-2">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
+                      <span className={`text-xs px-2 py-1 rounded-full border ${
                         subscription.isActive 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-gray-100 text-gray-700'
+                          ? 'bg-green-900/50 text-green-400 border-green-700/50' 
+                          : 'bg-gray-700/50 text-gray-400 border-gray-600/50'
                       }`}>
                         {subscription.isActive ? 'Active' : 'Inactive'}
                       </span>
                       <div className="flex gap-1">
                         {subscription.enableInApp && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">App</span>
+                          <span className="text-xs bg-orange-900/50 text-orange-400 border border-orange-700/50 px-1.5 py-0.5 rounded">App</span>
                         )}
                         {subscription.enableSms && (
-                          <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">SMS</span>
+                          <span className="text-xs bg-green-900/50 text-green-400 border border-green-700/50 px-1.5 py-0.5 rounded">SMS</span>
                         )}
                         {subscription.enableTelegram && (
-                          <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">Telegram</span>
+                          <span className="text-xs bg-blue-900/50 text-blue-400 border border-blue-700/50 px-1.5 py-0.5 rounded">Telegram</span>
                         )}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => removeSubscription(subscription.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                    className="p-2 text-gray-400 hover:text-red-400 transition-colors"
                     title="Remove subscription"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -353,9 +353,9 @@ export default function SettingsPage() {
 
               {subscriptions.length === 0 && (
                 <div className="text-center py-8">
-                  <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No active subscriptions</p>
-                  <p className="text-sm text-gray-400">Add your first subscription above</p>
+                  <Bell className="h-12 w-12 text-gray-500 mx-auto mb-3" />
+                  <p className="text-gray-400">No active subscriptions</p>
+                  <p className="text-sm text-gray-500">Add your first subscription above</p>
                 </div>
               )}
             </div>
@@ -367,7 +367,7 @@ export default function SettingsPage() {
           <button
             onClick={saveSettings}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 via-orange-600 to-red-600 hover:from-red-700 hover:via-orange-700 hover:to-red-700 disabled:opacity-50 text-white rounded-lg transition-all duration-300 shadow-lg"
           >
             {saving ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

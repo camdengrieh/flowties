@@ -60,11 +60,11 @@ function EventCard({ event }: { event: Event }) {
   return (
     <Link
       href={`/nft/${event.collection.name}/${event.tokenId}`}
-      className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors"
+      className="block bg-gradient-to-br from-gray-800 to-red-900/20 rounded-lg border border-gray-700/50 p-4 hover:border-orange-500/50 transition-all duration-200 hover:bg-gradient-to-br hover:from-gray-700 hover:to-red-800/30"
     >
       <div className="flex items-start gap-3">
         {event.image && (
-          <div className="w-16 h-16 relative rounded-lg overflow-hidden flex-shrink-0">
+          <div className="w-16 h-16 relative rounded-lg overflow-hidden flex-shrink-0 border border-gray-600/50">
             <Image
               src={event.image}
               alt={event.name}
@@ -74,17 +74,17 @@ function EventCard({ event }: { event: Event }) {
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-900 truncate">
+          <h3 className="font-medium text-white truncate">
             {event.name}
           </h3>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-orange-300">
               {formatPrice(event.price)} {event.currency}
             </span>
           </div>
-          <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
             <span>{formatTime(event.timestamp)}</span>
-            <span className="text-gray-300">•</span>
+            <span className="text-gray-600">•</span>
             <span className="text-gray-500">{event.platform}</span>
           </div>
         </div>
@@ -100,11 +100,11 @@ function ActivityColumn({ title, icon: Icon, events, type }: {
   type: "listing" | "offer" | "sale";
 }) {
   return (
-    <div className="flex-1 bg-white rounded-lg border border-gray-200 shadow-sm">
-      <div className="px-4 py-3 border-b border-gray-200">
+    <div className="flex-1 bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg border border-red-900/30 shadow-2xl">
+      <div className="px-4 py-3 border-b border-red-900/30">
         <div className="flex items-center gap-2">
-          <Icon className="h-5 w-5 text-gray-700" />
-          <h2 className="font-semibold text-gray-900">{title}</h2>
+          <Icon className="h-5 w-5 text-orange-400" />
+          <h2 className="font-semibold text-white">{title}</h2>
         </div>
       </div>
       <div className="p-4">
@@ -113,7 +113,7 @@ function ActivityColumn({ title, icon: Icon, events, type }: {
             <EventCard key={event.id} event={event} />
           ))}
           {events.filter(e => e.type === type).length === 0 && (
-            <div className="text-center py-6 text-gray-500">
+            <div className="text-center py-6 text-gray-400">
               No {type}s yet
             </div>
           )}
@@ -315,17 +315,17 @@ export default function MarketActivity() {
   return (
     <div className="space-y-6">
       {/* Collection Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-red-900/30">
         <nav className="-mb-px flex space-x-8" aria-label="Collections">
           {COLLECTIONS.map((collection) => (
             <button
               key={collection.slug}
               onClick={() => setSelectedCollection(collection.slug)}
               className={`
-                whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm
+                whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors
                 ${selectedCollection === collection.slug
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-orange-500 text-orange-400'
+                  : 'border-transparent text-gray-400 hover:text-orange-300 hover:border-orange-500/50'
                 }
               `}
             >
@@ -339,12 +339,12 @@ export default function MarketActivity() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+            <div key={i} className="bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg border border-red-900/30 shadow-2xl p-4">
               <div className="animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
                 <div className="space-y-3">
                   {[...Array(3)].map((_, j) => (
-                    <div key={j} className="h-20 bg-gray-100 rounded"></div>
+                    <div key={j} className="h-20 bg-gray-800 rounded"></div>
                   ))}
                 </div>
               </div>

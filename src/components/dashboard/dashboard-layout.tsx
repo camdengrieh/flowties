@@ -16,10 +16,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // Show loading state while Privy initializes
   if (!ready) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-black via-red-950 to-black flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading...</p>
         </div>
       </div>
     );
@@ -28,16 +28,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // Show login screen if not authenticated
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+      <div className="min-h-screen bg-gradient-to-br from-black via-blue-950 to-black flex items-center justify-center">
+        <div className="max-w-md w-full bg-gradient-to-br from-gray-900 via-red-950 to-gray-900 rounded-lg shadow-2xl border border-red-900/50 p-8">
           <div className="text-center">
             <button
               onClick={login}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="w-full bg-gradient-to-r from-red-600 via-orange-600 to-red-600 hover:from-red-700 hover:via-orange-700 hover:to-red-700 text-white py-3 px-4 rounded-lg transition-all duration-300 font-medium shadow-lg"
             >
               Connect Wallet & Sign In
             </button>
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-gray-400 mt-4">
               Sign in with your wallet, email, or Google account
             </p>
           </div>
@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen max-w-screen bg-gray-50">
+    <div className="min-h-screen max-w-screen bg-gradient-to-br from-black via-red-950/20 to-blue-950/20">
       {user && (
         <Header 
           user={user} 
