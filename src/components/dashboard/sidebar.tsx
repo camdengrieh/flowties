@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { packBattlesABI } from '../../lib/abis/PackBattles';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x52b68B2576d3D4bc1eDC63cF36dB1B1BDCCc4F80';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home, description: 'Main dashboard' },
@@ -50,13 +50,13 @@ export default function Sidebar() {
 
   return (
     <div 
-      className={`fixed left-0 top-14 h-[calc(100vh-3.5rem)] bg-gradient-to-b from-black via-red-950 to-blue-950 border-r border-red-900/30 z-20 transition-all duration-300 ease-out ${
-        isHovered ? 'w-56 shadow-2xl shadow-black/50' : 'w-16'
+      className={`fixed items-center left-0 top-14 h-[calc(100vh-3.5rem)] bg-gradient-to-b from-black via-red-950 to-blue-950 border-r border-red-900/30 z-20 transition-all duration-300 ease-out ${
+        isHovered ? 'w-56' : 'w-16'
       }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <nav className="flex flex-col py-4 space-y-3">
+      <nav className="flex justify-center flex-col py-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -69,14 +69,14 @@ export default function Sidebar() {
                   : 'text-gray-400 hover:text-orange-300 hover:bg-red-950/50'
               } ${
                 isHovered 
-                  ? 'mx-3 px-3 justify-start' 
-                  : 'mx-3 w-10 justify-center'
+                  ? 'mx-3 px-3' 
+                  : 'mx-3 justify-center'
               }`}
               title={!isHovered ? item.description : undefined}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
               <span className={`ml-3 font-medium transition-all duration-300 ${
-                isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 pointer-events-none'
+                isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 w-0 -translate-x-2'
               }`}>
                 {item.name}
               </span>

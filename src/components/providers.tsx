@@ -3,11 +3,21 @@
 import { PrivyProvider } from '@privy-io/react-auth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PonderProvider } from '@ponder/react';
+import { WagmiProvider, createConfig, http } from 'wagmi';
+import { flowMainnet } from 'wagmi/chains';
 import { client } from '../lib/ponder';
 import { useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 
 const queryClient = new QueryClient();
+
+// Configure Wagmi
+const config = createConfig({
+  chains: [flowMainnet],
+  transports: {
+    [flowMainnet.id]: http("https://mainnet.evm.nodes.onflow.org"),
+  },
+});
 
 // Component to handle user registration/sync
 function UserSync() {
@@ -44,25 +54,27 @@ function UserSync() {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <PrivyProvider 
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
-      config={{
-        loginMethods: ['email', 'wallet', 'google'],
-        appearance: {
-          theme: 'light',
-          accentColor: '#676FFF',
-        },
-        embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
-        },
-      }}
-    >
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <PonderProvider client={client}>
-          <UserSync />
-          {children}
-        </PonderProvider>
+        <PrivyProvider 
+          appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
+          config={{
+            loginMethods: ['email', 'wallet', 'google'],
+            appearance: {
+              theme: 'light',
+              accentColor: '#676FFF',
+            },
+            embeddedWallets: {
+              createOnLogin: 'users-without-wallets',
+            },
+          }}
+        >
+          <PonderProvider client={client}>
+            <UserSync />
+            {children}
+          </PonderProvider>
+        </PrivyProvider>
       </QueryClientProvider>
-    </PrivyProvider>
+    </WagmiProvider>
   );
 } 

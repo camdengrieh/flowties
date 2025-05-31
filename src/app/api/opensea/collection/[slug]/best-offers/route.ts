@@ -22,6 +22,7 @@ export async function GET(
     const data = await response.json();
     
     // Sort offers by price (highest first) and take top 5
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sortedOffers = data.offers.sort((a: any, b: any) => {
       const priceA = Number(a.price.current.value);
       const priceB = Number(b.price.current.value);

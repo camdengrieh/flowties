@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processVolumeSurgeNotifications(data: any) {
   const { collection, volume24h, threshold } = data;
   

@@ -1,6 +1,5 @@
 'use client';
 
-import DashboardLayout from '../components/dashboard/dashboard-layout';
 import StatsCard from '../components/dashboard/stats-card';
 import Watchlist from '../components/dashboard/watchlist';
 import MarketActivity from '../components/dashboard/market-activity';
@@ -13,7 +12,6 @@ export default function HomePage() {
   useTopOfferNotifications();
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
 
         {/* Stats Grid */}
@@ -54,6 +52,5 @@ export default function HomePage() {
         {/* Watchlist */}
         <Watchlist />
       </div>
-    </DashboardLayout>
   );
 }
