@@ -1,9 +1,13 @@
 'use client';
 
-import { Home, TrendingUp, Sword, Settings } from 'lucide-react';
+import { Home, TrendingUp, Sword, Settings, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useAccount, useReadContract } from 'wagmi';
+import { packBattlesABI } from '../../lib/abis/PackBattles';
+
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home, description: 'Main dashboard' },
@@ -16,13 +20,33 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { address } = useAccount();
+  const [isOwner, setIsOwner] = useState(false);
+
+  const { data: owner } = useReadContract({
+    address: PACK_BATTLES_ADDRESS as `0x${string}`,
+    abi: packBattlesABI,
+    functionName: 'owner',
+  });
 
   // Prevent hydration mismatch
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    if (owner && address) {
+      setIsOwner(owner.toLowerCase() === address.toLowerCase());
+    }
+  }, [owner, address]);
+
   if (!isClient) return null;
+
+  // Combine navigation items with admin link if user is owner
+  const navItems = isOwner ? [
+    ...navigation,
+    { name: 'Admin', href: '/admin', icon: Shield, description: 'Contract Administration' },
+  ] : navigation;
 
   return (
     <div 
@@ -33,7 +57,7 @@ export default function Sidebar() {
       onMouseLeave={() => setIsHovered(false)}
     >
       <nav className="flex flex-col py-4 space-y-3">
-        {navigation.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
