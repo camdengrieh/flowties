@@ -29,9 +29,9 @@ type EventCallback = (event: StreamEvent) => void;
 // Target collections to monitor
 const TARGET_COLLECTIONS = [
   {
-    slug: 'monster-capsules',
-    name: 'Monster Capsules',
-    address: '0x38272b362bca267dc8e9120087c93cefb86a69ac'
+    slug: 'nba-top-shot',          // NBA TopShot
+    name: 'NBA TopShot',
+    address: '0x84c6a2e6765e88427c41bb38c82a78b570e24709'
   },
 ];
 
@@ -248,8 +248,6 @@ export class OpenSeaStreamService {
       try {
         this.client.connect();
         this.isConnected = true;
-        console.log('OpenSea Stream connected for target collections:', TARGET_COLLECTIONS.map(c => c.name).join(', '));
-        console.log('Monitoring events: Item Listed, Item Sold, Item Received Offer');
         resolve();
       } catch (error) {
         console.error('Failed to connect to OpenSea Stream:', error);

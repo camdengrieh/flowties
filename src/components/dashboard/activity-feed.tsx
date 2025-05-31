@@ -485,11 +485,6 @@ export default function ActivityFeed() {
                           <span className="text-xs text-gray-500">
                             {formatTime(event.timestamp)}
                           </span>
-                          {event.blockNumber && (
-                            <span className="text-xs text-gray-500">
-                              Block #{event.blockNumber}
-                            </span>
-                          )}
                           {event.platform && (
                             <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
                               {event.platform}

@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import Header from './header';
 import Sidebar from './sidebar';
+import SalesMarquee from './sales-marquee';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -30,10 +31,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Flow NFT Dashboard</h1>
-            <p className="text-gray-600 mb-6">
-              Monitor Flow NFT activity and manage your notifications
-            </p>
             <button
               onClick={login}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -63,10 +60,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           }}
         />
       )}
+      <SalesMarquee />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-6">
-          {children}
+        <main className="flex-1 transition-all duration-300 ease-in-out" style={{ marginLeft: '64px' }}>
+          <div className="p-6">
+            {children}
+          </div>
         </main>
       </div>
     </div>
