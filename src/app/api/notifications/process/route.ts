@@ -131,6 +131,7 @@ async function processSaleNotifications(data: any) {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processOfferNotifications(data: any) {
   const { offerer, recipient, collection, tokenId, price } = data;
 

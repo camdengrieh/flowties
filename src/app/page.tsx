@@ -5,14 +5,19 @@ import StatsCard from '../components/dashboard/stats-card';
 import Notifications from '../components/dashboard/notifications';
 import Watchlist from '../components/dashboard/watchlist';
 import ActivityFeed from '../components/dashboard/activity-feed';
+import SalesMarquee from "../components/dashboard/sales-marquee";
 import { Bell, Eye, Activity, TrendingUp } from 'lucide-react';
 import { useCollectionStats } from '../lib/hooks/useCollectionStats';
+import { useTopOfferNotifications } from '@/lib/hooks/useTopOfferNotifications';
 
 export default function HomePage() {
   const { dashboardStats, loading } = useCollectionStats();
+  useTopOfferNotifications();
 
   return (
     <DashboardLayout>
+      <SalesMarquee />
+      <div className="h-8" />
       <div className="space-y-6">
         {/* Page Header */}
         <div>

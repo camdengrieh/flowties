@@ -66,7 +66,7 @@ interface EventsResponse {
   };
 }
 
-export default function ActivityFeed() {
+export default function ListingsFeed() {
   const { user } = usePrivy();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
