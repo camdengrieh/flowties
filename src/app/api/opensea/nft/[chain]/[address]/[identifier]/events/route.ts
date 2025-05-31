@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { chain: string; address: string; identifier: string } }
+  { params }: { params: Promise<{ chain: string; address: string; identifier: string }> }
 ) {
   try {
-    const { chain, address, identifier } = params;
+    const { chain, address, identifier } = await params;
     const { searchParams } = new URL(request.url);
     
     if (!chain || !address || !identifier) {

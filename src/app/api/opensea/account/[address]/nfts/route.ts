@@ -4,9 +4,10 @@ const OPENSEA_API_KEY = process.env.NEXT_PUBLIC_OPENSEA_API_KEY;
 
 export async function GET(
   request: Request,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
   try {
+    const { address } = await params;
     const { searchParams } = new URL(request.url);
     const collection = searchParams.get('collection');
     const chain = searchParams.get('chain') || 'flow';
@@ -25,7 +26,7 @@ export async function GET(
       );
     }
 
-    const url = `https://api.opensea.io/api/v2/chain/${chain}/account/${params.address}/nfts?collection=${collection}`;
+    const url = `https://api.opensea.io/api/v2/chain/${chain}/account/${address}/nfts?collection=${collection}`;
     
     const response = await fetch(url, {
       headers: {

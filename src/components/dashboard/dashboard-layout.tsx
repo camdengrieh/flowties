@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { ready, authenticated, user, login, logout } = usePrivy();
+  const { ready, authenticated, user, login } = usePrivy();
 
   // Show loading state while Privy initializes
   if (!ready) {
@@ -48,18 +48,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen max-w-screen bg-gradient-to-br from-black via-red-950/20 to-blue-950/20 overflow-x-hidden">
-      {user && (
-        <Header 
-          user={user} 
-          onLogout={logout}
-          userInfo={{
-            id: user.id,
-            email: user.email?.address,
-            wallet: user.wallet?.address,
-            createdAt: user.createdAt.toISOString()
-          }}
-        />
-      )}
+      {user && <Header />}
       <div className="flex overflow-x-hidden">
         <Sidebar />
         <div className="flex-1 min-w-0" style={{ marginLeft: '64px' }}>

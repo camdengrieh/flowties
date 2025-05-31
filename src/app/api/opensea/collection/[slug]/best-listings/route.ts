@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const response = await fetch(
-      `https://api.opensea.io/api/v2/listings/collection/${params.slug}/best`,
+      `https://api.opensea.io/api/v2/listings/collection/${slug}/best`,
       {
         headers: {
           'X-API-KEY': process.env.NEXT_PUBLIC_OPENSEA_API_KEY || '',

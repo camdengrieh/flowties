@@ -12,13 +12,26 @@ interface NFTMeta {
   traits?: {trait_type:string;value:string}[];
 }
 
-export default function NFTDetailPage({ params }: { params: { collection: string; tokenId: string } }) {
-  const { collection, tokenId } = params;
+export default function NFTDetailPage({ params }: { params: Promise<{ collection: string; tokenId: string }> }) {
+  const [collection, setCollection] = useState<string>('');
+  const [tokenId, setTokenId] = useState<string>('');
   const [meta, setMeta] = useState<NFTMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Handle async params
   useEffect(() => {
+    async function handleParams() {
+      const resolvedParams = await params;
+      setCollection(resolvedParams.collection);
+      setTokenId(resolvedParams.tokenId);
+    }
+    handleParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (!collection || !tokenId) return;
+    
     async function fetchMeta() {
       try {
         const apiKey = process.env.NEXT_PUBLIC_OPENSEA_API_KEY;
