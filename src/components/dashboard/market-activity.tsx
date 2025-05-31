@@ -55,9 +55,7 @@ function EventCard({ event }: { event: Event }) {
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  const formatPrice = (price: string) => {
-    return (Number(price) / 1e18).toFixed(4);
-  };
+  const formatPrice = (price: string) => price;
 
   return (
     <Link
@@ -127,52 +125,90 @@ function ActivityColumn({ title, icon: Icon, events, type }: {
 
 export default function MarketActivity() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [lowestAsksEvents, setLowestAsksEvents] = useState<Event[]>([]);
+  const [recentListingsEvents, setRecentListingsEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCollection, setSelectedCollection] = useState<string>(COLLECTIONS[0].slug);
 
   useEffect(() => {
     async function fetchMarketData() {
       setLoading(true);
-      let listingsData, offersData;
+      let listingsData, allListingsData, offersData;
       
       try {
-        const [listingsRes, offersRes] = await Promise.all([
+        const [bestListingsRes, allListingsRes, offersRes] = await Promise.all([
           fetch(`/api/opensea/collection/${selectedCollection}/best-listings`),
+          fetch(`/api/opensea/collection/${selectedCollection}/all-listings`),
           fetch(`/api/opensea/collection/${selectedCollection}/best-offers`)
         ]);
 
-        [listingsData, offersData] = await Promise.all([
-          listingsRes.json(),
+        [listingsData, allListingsData, offersData] = await Promise.all([
+          bestListingsRes.json(),
+          allListingsRes.json(),
           offersRes.json()
         ]);
 
         const collection = COLLECTIONS.find(c => c.slug === selectedCollection);
         if (!collection) throw new Error('Collection not found');
 
-        const mappedListings: Event[] = (listingsData.listings || []).slice(0, 5).map((listing: any) => {
+        // Helper to format price safely
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const formatPriceModel = (priceModel: any): string => {
+          const raw = Number(priceModel?.value ?? 0);
+          const dec = priceModel?.decimals ?? 18;
+          // If decimals is 0 but the raw value is huge, assume 18
+          const divisor = dec === 0 && raw > 1e12 ? Math.pow(10, 18) : Math.pow(10, dec);
+          return (raw / divisor).toFixed(4);
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mapListing = (listing: any): Event => {
           const asset = listing.maker_asset_bundle?.assets?.[0];
+
+          const tokenIdRaw = asset?.token_id || listing.protocol_data?.parameters?.offer?.[0]?.identifierOrCriteria || '0';
+          const tokenIdStr = String(tokenIdRaw);
+
           return {
             id: listing.order_hash,
             type: 'listing',
             collection: {
-              address: listing.protocol_data?.parameters?.consideration?.[0]?.token || '',
+              address: listing.protocol_data?.parameters?.offer?.[0]?.token || '',
               name: collection.name,
               image: asset?.collection?.image_url || ''
             },
-            tokenId: listing.protocol_data?.parameters?.consideration?.[0]?.identifierOrCriteria || 'unknown',
-            name: asset?.name || `${collection.name} #${listing.protocol_data?.parameters?.consideration?.[0]?.identifierOrCriteria}`,
+            tokenId: tokenIdStr,
+            name: tokenIdStr === '0' ? `${collection.name} (Collection Ask)` : asset?.name || `${collection.name} #${tokenIdStr}`,
             seller: listing.maker?.address,
-            price: listing.price.current.value,
-            currency: listing.price.current.currency.symbol,
+            price: formatPriceModel(listing.price.current),
+            currency: listing.price.current?.currency || 'ETH',
             platform: 'OpenSea',
-            timestamp: new Date(listing.created_date).getTime() / 1000,
+            timestamp: listing.listing_time || Math.floor(new Date(listing.created_date || new Date()).getTime() / 1000),
             blockNumber: 0,
-            image: asset?.image_url || ''
+            image: asset?.image_url || asset?.collection?.image_url || '/placeholder.png'
           };
-        });
+        };
 
-        const mappedOffers: Event[] = (offersData.offers || []).slice(0, 5).map((offer: any) => {
+        const lowestAsksAll: Event[] = (listingsData.listings || []).map(mapListing);
+
+        const recentAllListings: Event[] = (allListingsData.listings || []).map(mapListing);
+
+        // Filter recent listings to exclude ones already in lowest asks (by id)
+        const lowestIds = new Set(lowestAsksAll.map((e) => e.id));
+        const latestListings = recentAllListings
+          .filter((e) => !lowestIds.has(e.id))
+          .sort((a, b) => b.timestamp - a.timestamp)
+          .slice(0, 5);
+
+        // Derive lowest asks (already sorted by API as cheapest) just slice 5
+        const lowestAsks = lowestAsksAll.slice(0, 5);
+
+        const mappedOffers: Event[] = (offersData.offers || []).map(
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */ 
+            (offer: any) => {
           const asset = offer.taker_asset_bundle?.assets?.[0];
+
+          const displayPrice = formatPriceModel(offer.price.current);
+
           return {
             id: offer.order_hash,
             type: 'offer',
@@ -181,22 +217,90 @@ export default function MarketActivity() {
               name: collection.name,
               image: asset?.collection?.image_url || ''
             },
-            tokenId: offer.protocol_data?.parameters?.offer?.identifierOrCriteria || 'unknown',
-            name: asset?.name || `${collection.name} #${offer.protocol_data?.parameters?.offer?.identifierOrCriteria}`,
+            tokenId: asset?.token_id || offer.protocol_data?.parameters?.offer?.identifierOrCriteria || 'unknown',
+            name: asset?.name || `${collection.name} #${asset?.token_id ?? '??'}`,
             buyer: offer.maker?.address,
-            price: offer.price.current.value,
-            currency: offer.price.current.currency.symbol,
+            price: displayPrice,
+            currency: offer.price.current?.currency || 'ETH',
             platform: 'OpenSea',
             timestamp: new Date(offer.created_date).getTime() / 1000,
             blockNumber: 0,
-            image: asset?.image_url || ''
+            image: asset?.image_url || asset?.collection?.image_url || '/placeholder.png'
           };
         });
 
-        setEvents([...mappedListings, ...mappedOffers]);
+        // Fetch metadata for all events to enrich images & names
+        const allEventsForMeta = [...lowestAsks, ...latestListings, ...mappedOffers];
+        const tokensPayload = allEventsForMeta.map((e) => ({
+          contractAddress: e.collection.address,
+          tokenId: e.tokenId
+        }));
+
+        try {
+          const metaRes = await fetch('/api/opensea/metadata-batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tokens: tokensPayload })
+          });
+
+          if (metaRes.ok) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const metadataArray = await metaRes.json() as any[];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const metaMap: Map<string, any> = new Map();
+            metadataArray.forEach((meta) => {
+              const key = `${meta.contract?.address?.toLowerCase() || ''}-${meta.tokenId}`;
+              metaMap.set(key, meta);
+            });
+
+            const patchEvent = (event: Event): Event => {
+              const key = `${event.collection.address.toLowerCase()}-${event.tokenId}`;
+              const meta = metaMap.get(key);
+              if (meta) {
+                // Support both OpenSea and Alchemy response shapes
+                const imageUrl =
+                  meta.nft?.image_url ||
+                  meta.image_url ||
+                  meta.image?.cachedUrl ||
+                  meta.image?.pngUrl ||
+                  meta.image?.thumbnailUrl ||
+                  meta.image?.originalUrl;
+
+                const displayName =
+                  meta.nft?.name || meta.name || event.name;
+
+                return {
+                  ...event,
+                  image: event.image || imageUrl || event.image,
+                  name: !event.name || event.name.includes('Collection Ask') ? displayName : event.name
+                };
+              }
+              return event;
+            };
+
+            const offersPatched = mappedOffers.map(patchEvent);
+            const lowestPatched = lowestAsks.map(patchEvent);
+            const latestPatched = latestListings.map(patchEvent);
+
+            setEvents(offersPatched);
+            setLowestAsksEvents(lowestPatched);
+            setRecentListingsEvents(latestPatched);
+          } else {
+            // fallback to existing events if metadata call fails
+            setEvents(mappedOffers);
+            setLowestAsksEvents(lowestAsks);
+            setRecentListingsEvents(latestListings);
+          }
+        } catch (metaErr) {
+          console.error('Failed to fetch metadata batch:', metaErr);
+          setEvents(mappedOffers);
+          setLowestAsksEvents(lowestAsks);
+          setRecentListingsEvents(latestListings);
+        }
       } catch (error) {
         console.error('Failed to fetch market data:', error);
         console.log('Listings Response:', listingsData);
+        console.log('All Listings Response:', allListingsData);
         console.log('Offers Response:', offersData);
       } finally {
         setLoading(false);
@@ -258,14 +362,14 @@ export default function MarketActivity() {
           <ActivityColumn 
             title="Lowest Asks" 
             icon={Tag}
-            events={events}
+            events={lowestAsksEvents}
             type="listing"
           />
           <ActivityColumn 
             title="New Listings" 
             icon={ListPlus}
-            events={events}
-            type="sale"
+            events={recentListingsEvents}
+            type="listing"
           />
         </div>
       )}

@@ -6,11 +6,11 @@ export async function GET(
 ) {
   try {
     const response = await fetch(
-      `https://api.opensea.io/api/v2/listings/collection/${params.slug}/best`,
+      `https://api.opensea.io/api/v2/listings/collection/${params.slug}/all`,
       {
         headers: {
           'X-API-KEY': process.env.NEXT_PUBLIC_OPENSEA_API_KEY || '',
-          'accept': 'application/json'
+          accept: 'application/json'
         }
       }
     );
@@ -20,10 +20,9 @@ export async function GET(
     }
 
     const data = await response.json();
-
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching best listings:', error);
+    console.error('Error fetching all listings:', error);
     return NextResponse.json({ error: 'Failed to fetch listings' }, { status: 500 });
   }
 } 

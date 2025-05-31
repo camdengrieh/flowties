@@ -217,18 +217,18 @@ export async function GET(request: NextRequest) {
 
         if (userAddress) {
           params.append('account_address', userAddress);
-        }
+    }
 
         // Specify Flow chain explicitly
         params.append('chain_identifier', 'FLOW');
 
         // Call OpenSea Events API for this collection
         const openSeaUrl = `https://api.opensea.io/api/v2/events/collection/${collectionSlug}?${params.toString()}`;
-        
+
         console.log(`🌐 Fetching OpenSea events for ${collectionSlug}:`, openSeaUrl);
-        
+
         const response = await fetch(openSeaUrl, {
-          headers: {
+      headers: {
             'X-API-KEY': apiKey,
             'Accept': 'application/json'
           }
@@ -249,13 +249,13 @@ export async function GET(request: NextRequest) {
           if (response.status === 404) {
             console.log(`🔍 Collection '${collectionSlug}' not found. This might be the wrong slug.`);
             console.log(`💡 Try checking OpenSea directly: https://opensea.io/collection/${collectionSlug}`);
-          }
-          
+    }
+
           continue; // Skip this collection and continue with others
         }
 
         const data: OpenSeaEventsResponse = await response.json();
-        
+    
         // Log the complete raw response to understand the structure
         console.log(`📊 Complete raw OpenSea response for ${collectionSlug}:`, data);
         
@@ -272,7 +272,7 @@ export async function GET(request: NextRequest) {
           totalEvents: data.asset_events?.length || 0,
           hasNext: !!data.next
         });
-        
+
         // If no events, log why
         if (!data.asset_events || data.asset_events.length === 0) {
           console.log(`⚠️ No events found for ${collectionSlug}. This could mean:`);

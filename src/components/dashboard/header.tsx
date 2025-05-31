@@ -53,7 +53,7 @@ export default function Header({ onLogout, userInfo }: HeaderProps) {
   };
 
   return (
-    <header className="bg-[#1a1b1e] border-b border-gray-800">
+    <header className="bg-[#1a1b1e] border-b border-gray-800 sticky top-0 z-30">
       <div className="h-14 px-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">

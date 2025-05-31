@@ -25,10 +25,10 @@ export default function Sidebar() {
 
   return (
     <div 
-      className="fixed left-0 top-14 bottom-0 z-20 flex flex-col bg-gray-900 shadow-xl transition-all duration-300 ease-in-out"
+      className="fixed left-0 top-14 bottom-0 z-20 flex flex-col bg-[#1a1b1e] shadow-xl transition-all duration-300 ease-in-out"
       style={{ 
         width: isHovered ? '240px' : '64px',
-        borderRight: '1px solid rgb(31, 32, 35)'
+        borderRight: '1px solid rgb(00, 00, 00)'
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
