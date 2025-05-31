@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen max-w-screen bg-gradient-to-br from-black via-red-950/20 to-blue-950/20">
+    <div className="min-h-screen max-w-screen bg-gradient-to-br from-black via-red-950/20 to-blue-950/20 overflow-x-hidden">
       {user && (
         <Header 
           user={user} 
@@ -60,14 +60,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           }}
         />
       )}
-      <SalesMarquee />
-      <div className="flex">
+      <div className="flex overflow-x-hidden">
         <Sidebar />
-        <main className="flex-1 transition-all duration-300 ease-in-out" style={{ marginLeft: '64px' }}>
-          <div className="p-6">
-            {children}
-          </div>
-        </main>
+        <div className="flex-1 min-w-0" style={{ marginLeft: '64px' }}>
+          <SalesMarquee />
+          <main className="transition-all duration-300 ease-in-out">
+            <div className="p-6">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

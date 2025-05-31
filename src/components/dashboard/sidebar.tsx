@@ -15,6 +15,7 @@ const navigation = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -24,22 +25,37 @@ export default function Sidebar() {
   if (!isClient) return null;
 
   return (
-    <div className="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-16 bg-gradient-to-b from-black via-red-950 to-blue-950 border-r border-red-900/30 z-20">
-      <nav className="flex flex-col items-center py-4 space-y-3">
+    <div 
+      className={`fixed left-0 top-14 h-[calc(100vh-3.5rem)] bg-gradient-to-b from-black via-red-950 to-blue-950 border-r border-red-900/30 z-20 transition-all duration-300 ease-out ${
+        isHovered ? 'w-56 shadow-2xl shadow-black/50' : 'w-16'
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <nav className="flex flex-col py-4 space-y-3">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
               href={item.href}
-              className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 group ${
+              className={`h-10 flex items-center rounded-lg transition-all duration-200 group ${
                 isActive 
                   ? 'bg-gradient-to-br from-orange-600 to-red-600 text-white shadow-lg' 
                   : 'text-gray-400 hover:text-orange-300 hover:bg-red-950/50'
+              } ${
+                isHovered 
+                  ? 'mx-3 px-3 justify-start' 
+                  : 'mx-3 w-10 justify-center'
               }`}
-              title={item.description}
+              title={!isHovered ? item.description : undefined}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              <span className={`ml-3 font-medium transition-all duration-300 ${
+                isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2 pointer-events-none'
+              }`}>
+                {item.name}
+              </span>
             </Link>
           );
         })}

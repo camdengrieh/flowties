@@ -36,7 +36,7 @@ export default function SalesMarquee() {
       setSales((prevSales) => {
         const newSales = mapped.filter(sale => !prevSales.some(ps => ps.id === sale.id));
         const existingSales = mapped.filter(sale => prevSales.some(ps => ps.id === sale.id));
-        return [...newSales.map(s => ({ ...s, isNew: true })), ...existingSales].slice(0, 5);
+        return [...newSales.map(s => ({ ...s, isNew: true })), ...existingSales].slice(0, 4);
       });
       
       // Reset isNew flag after animation
@@ -52,9 +52,9 @@ export default function SalesMarquee() {
   if (!sales.length) return null;
 
   return (
-    <div className="bg-gradient-to-r from-black via-red-950/50 to-blue-950/50 border-b border-red-900/30 py-1 w-full">
-      <div className="w-full mx-auto items-center px-2 sm:px-3 lg:px-5">
-        <div className="flex justify-center items-stretch gap-4 overflow-x-auto pb-2">
+    <div className="bg-gradient-to-r from-black via-red-950/50 to-blue-950/50 border-b border-red-900/30 py-1 overflow-hidden">
+      <div className="mx-auto items-center px-2 sm:px-3 lg:px-5">
+        <div className="flex items-stretch gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory min-w-0">
           {sales.map((sale) => (
             <Link
               key={sale.id}
@@ -62,20 +62,20 @@ export default function SalesMarquee() {
                 ? `/nft/${encodeURIComponent(sale.collection.name || sale.collection.address)}/${encodeURIComponent(sale.tokenId)}`
                 : "#"
               }
-              className={`flex-none w-64 rounded-lg border p-4 transition-all duration-500 hover:shadow-lg ${
+              className={`flex-none w-64 sm:w-72 rounded-lg border p-4 transition-all duration-500 hover:shadow-lg snap-start ${
                 sale.isNew 
                   ? 'bg-gradient-to-br from-green-900/80 to-green-800/80 border-green-500/50 scale-105 shadow-green-500/25' 
                   : 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-700/50 hover:border-orange-500/50'
               }`}
             >
               <div className="flex flex-col gap-1">
-                <div className="text-base font-medium text-white truncate">
+                <div className="text-sm sm:text-base font-medium text-white truncate">
                   {sale.name}
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-500 to-red-500"></div>
-                  <span className="text-sm text-gray-300">Sold for</span>
-                  <span className="text-sm font-medium text-orange-300">
+                  <span className="text-xs sm:text-sm text-gray-300">Sold for</span>
+                  <span className="text-xs sm:text-sm font-medium text-orange-300">
                     {sale.price} {sale.currency}
                   </span>
                 </div>
@@ -84,6 +84,16 @@ export default function SalesMarquee() {
           ))}
         </div>
       </div>
+      
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari and Opera */
+        }
+      `}</style>
     </div>
   );
 }

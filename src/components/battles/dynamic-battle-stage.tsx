@@ -60,11 +60,7 @@ const DynamicBattleStage: React.FC<Props> = ({ initialData, onReset }) => {
 
   return (
     <div className="flex w-full flex-col items-center gap-12 min-h-screen py-8 bg-gradient-to-br from-black via-red-950/30 to-blue-950/30 overflow-hidden">
-      <div className={`flex items-center w-full relative px-8 transition-all duration-1000 ${
-        gameState === 'result' && showResult 
-          ? 'md:justify-between justify-center flex-col md:flex-row gap-8 md:gap-0' 
-          : 'justify-center gap-12 flex-col md:flex-row'
-      }`} style={{ minWidth: '320px' }}>
+      <div className="flex items-center justify-center w-full relative px-4 md:px-8 flex-col md:flex-row gap-8 md:gap-12 max-w-full">
         {/* Opponent card - shows first on mobile (top), second on desktop (right) */}
         <div className="order-1 md:order-2">
           <CardDisplay 
@@ -86,7 +82,7 @@ const DynamicBattleStage: React.FC<Props> = ({ initialData, onReset }) => {
               ? 'opacity-100 scale-100 translate-y-0' 
               : 'opacity-0 scale-50 translate-y-4'
           } left-1/2 transform -translate-x-1/2 md:top-auto top-1/2 md:-translate-y-0 -translate-y-1/2`}>
-            <div className={`px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-xl md:text-2xl shadow-2xl border-2 transform ${
+            <div className={`px-4 md:px-6 lg:px-8 py-3 md:py-4 rounded-xl font-bold text-lg md:text-xl lg:text-2xl shadow-2xl border-2 transform ${
               battleResult === 'win' 
                 ? 'bg-gradient-to-r from-green-600 via-green-500 to-green-600 text-white border-green-400 animate-pulse-glow-green' 
                 : battleResult === 'lose' 
@@ -94,9 +90,9 @@ const DynamicBattleStage: React.FC<Props> = ({ initialData, onReset }) => {
                 : 'bg-gradient-to-r from-yellow-600 via-orange-500 to-yellow-600 text-black border-orange-400 animate-pulse-glow-orange'
             }`}>
               <div className="flex items-center gap-2 md:gap-3">
-                {battleResult === 'win' && <Sparkles className="h-5 w-5 md:h-6 md:w-6" />}
+                {battleResult === 'win' && <Sparkles className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6" />}
                 {battleResult === 'win' ? 'YOU WIN!' : battleResult === 'lose' ? 'YOU LOSE!' : 'DRAW!'}
-                {battleResult === 'win' && <Sparkles className="h-5 w-5 md:h-6 md:w-6" />}
+                {battleResult === 'win' && <Sparkles className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6" />}
               </div>
             </div>
           </div>
@@ -229,6 +225,18 @@ const DynamicBattleStage: React.FC<Props> = ({ initialData, onReset }) => {
         .animate-pulse-glow-orange {
           animation: pulse-glow-orange 2s ease-in-out infinite !important;
         }
+
+        .card-back-size, .card-front-size {
+          width: 320px;
+          height: 384px;
+        }
+
+        @media (max-width: 768px) {
+          .card-back-size, .card-front-size {
+            width: 280px;
+            height: 336px;
+          }
+        }
       `}</style>
     </div>
   );
@@ -265,8 +273,10 @@ const CardDisplay: React.FC<CardDisplayProps> = ({
     }
     
     if (gameState === 'result' && showResult) {
-      // Subtle scaling when result is shown, main positioning handled by parent container
-      return 'opacity-100 translate-x-0 translate-y-0 scale-95';
+      // Smooth movement apart when result is shown
+      return opponent
+        ? 'opacity-100 translate-y-16 md:translate-y-0 md:translate-x-32 scale-95'
+        : 'opacity-100 -translate-y-16 md:translate-y-0 md:-translate-x-32 scale-95';
     }
     
     return 'opacity-100 translate-x-0 translate-y-0';
@@ -286,36 +296,36 @@ const CardDisplay: React.FC<CardDisplayProps> = ({
           <div className="card-flip-inner">
             {/* Card Back */}
             <div className="card-flip-back">
-              <div className={`w-80 h-96 rounded-xl shadow-2xl flex items-center justify-center border-4 border-orange-400 ${
+              <div className={`card-back-size rounded-xl shadow-2xl flex items-center justify-center border-4 border-orange-400 ${
                 opponent ? 'bg-gradient-to-br from-red-800 to-orange-900' : 'bg-gradient-to-br from-blue-800 to-red-900'
               }`}>
-                <div className="text-6xl">🎴</div>
+                <div className="text-4xl md:text-6xl">🎴</div>
               </div>
             </div>
             
             {/* Card Front */}
             <div className="card-flip-front">
               {showContent && (
-                <div className={`w-80 h-96 rounded-xl shadow-2xl border-4 ${getRarityColor()} p-4 flex flex-col transition-all duration-500 ${
+                <div className={`card-front-size rounded-xl shadow-2xl border-4 ${getRarityColor()} p-3 md:p-4 flex flex-col transition-all duration-500 ${
                   gameState === 'result' && showResult ? 'shadow-orange-500/20' : ''
                 }`}>
-                  <div className="text-center mb-3">
-                    <h3 className="font-bold text-base text-white">{card.name}</h3>
+                  <div className="text-center mb-2 md:mb-3">
+                    <h3 className="font-bold text-sm md:text-base text-white">{card.name}</h3>
                   </div>
                   
                   <div className="flex-1 flex items-center justify-center">
-                    <img src={card.image} alt={card.name} className="object-contain max-h-64 max-w-full rounded" />
+                    <img src={card.image} alt={card.name} className="object-contain max-h-48 md:max-h-64 max-w-full rounded" />
                   </div>
                   
                   {showMeta && (
-                    <div className="animate-fade-in-custom space-y-2 mt-3">
+                    <div className="animate-fade-in-custom space-y-2 mt-2 md:mt-3">
                       <div className="flex justify-between items-center">
-                        <span className="flex items-center gap-1 text-red-400 text-sm">
-                          <Sword size={14} />
+                        <span className="flex items-center gap-1 text-red-400 text-xs md:text-sm">
+                          <Sword size={12} className="md:w-[14px] md:h-[14px]" />
                           {card.attack}
                         </span>
-                        <span className="flex items-center gap-1 text-blue-400 text-sm">
-                          <Shield size={14} />
+                        <span className="flex items-center gap-1 text-blue-400 text-xs md:text-sm">
+                          <Shield size={12} className="md:w-[14px] md:h-[14px]" />
                           {card.defense}
                         </span>
                       </div>
