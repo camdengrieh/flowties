@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@opensea/stream-js':
+        specifier: ^0.1.3
+        version: 0.1.3
       '@ponder/client':
         specifier: ^0.11.9
         version: 0.11.9(typescript@5.8.3)
@@ -589,6 +592,10 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@opensea/stream-js@0.1.3':
+    resolution: {integrity: sha512-JygrVLinq2j0UOCLjdSskRE5wBcCCj4EQwrKgeKfO2I1k+XUpEqE9j0TfG38u1AbCU3y59J6LqpKBa1hxvTYhw==}
+    engines: {node: '>=16.11.0'}
 
   '@ponder/client@0.11.9':
     resolution: {integrity: sha512-ppCTPOv41hv3baGhCvgwzY13ZkmgoxgAl18/r2gg8kVR1xBLOH/2EW590HFhqf2IP5ab/h+Z8AvVbqteXmHNJQ==}
@@ -2694,6 +2701,9 @@ packages:
   path-parse@1.0.7:
     resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}
 
+  phoenix@1.7.21:
+    resolution: {integrity: sha512-8wOvJ8pQXRxNbyFlMI+wQhK3bvX4Ps3FtUX2+0cV6lkcebe9VTIl+xS60FLAeaPieFg80djor5z/AKofnwqAUw==}
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -4074,6 +4084,10 @@ snapshots:
       fastq: 1.19.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@opensea/stream-js@0.1.3':
+    dependencies:
+      phoenix: 1.7.21
 
   '@ponder/client@0.11.9(typescript@5.8.3)':
     dependencies:
@@ -7080,6 +7094,8 @@ snapshots:
   path-key@3.1.1: {}
 
   path-parse@1.0.7: {}
+
+  phoenix@1.7.21: {}
 
   picocolors@1.1.1: {}
 

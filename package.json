@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@opensea/stream-js": "^0.1.3",
     "@ponder/client": "^0.11.9",
     "@ponder/react": "^0.11.9",
     "@privy-io/react-auth": "^2.13.6",
