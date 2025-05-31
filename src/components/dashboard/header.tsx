@@ -94,14 +94,14 @@ export default function Header() {
           {/* Native FLOW Balance */}
           {isConnected && (
             <div className="flex items-center gap-2 text-orange-200">
-              <svg className="h-5 w-5" viewBox="0 0 784.37 1277.39" xmlns="http://www.w3.org/2000/svg">
+              {/* <svg className="h-5 w-5" viewBox="0 0 784.37 1277.39" xmlns="http://www.w3.org/2000/svg">
                 <g fill="currentColor">
                   <path d="M392.07 0l-8.57 29.11v844.63l8.57 8.55 392.06-231.75z"/>
                   <path d="M392.07 0L0 650.54l392.07 231.75V472.33z"/>
                   <path d="M392.07 956.52l-4.83 5.89v300.87l4.83 14.1 392.3-552.49z"/>
                   <path d="M392.07 1277.38V956.52L0 724.89z"/>
                 </g>
-              </svg>
+              </svg> */}
               <span className="font-mono">
                 {isLoadingNative ? '...' : `${formatBalance(nativeBalance?.value)} FLOW`}
               </span>

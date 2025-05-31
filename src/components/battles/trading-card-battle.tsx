@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Sparkles, Loader2, Trophy, Clock, Sword } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Sparkles, Loader2, Trophy, Clock, Sword, Eye } from 'lucide-react';
 import { useReadContract, useReadContracts, useWriteContract, useWatchPendingTransactions, useAccount } from 'wagmi';
 import { packBattlesABI } from '@/lib/abis/PackBattles';
 import DynamicBattleStage from './dynamic-battle-stage';
@@ -36,6 +37,7 @@ interface GameWithId extends Game {
 }
 
 export default function TradingCardBattle() {
+  const router = useRouter();
   const { address } = useAccount();
   const [loading, setLoading] = useState(false);
   const [payload, setPayload] = useState<BattlePayload | null>(null);
@@ -310,27 +312,36 @@ export default function TradingCardBattle() {
                           <span className="text-green-400 ml-2">1 FLOW</span>
                         </div>
                       </div>
-                      {address && game.creator.toLowerCase() !== address.toLowerCase() && (
+                      <div className="flex gap-2">
                         <button
-                          onClick={() => handleJoinGame(game.id)}
-                          disabled={joiningGameId === game.id}
-                          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          onClick={() => router.push(`/battles/${game.id}`)}
+                          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                         >
-                          {joiningGameId === game.id ? (
-                            <>
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              Joining...
-                            </>
-                          ) : (
-                            <>
-                              <Sword className="w-4 h-4" />
-                              Join Battle
-                            </>
-                          )}
+                          <Eye className="w-4 h-4" />
+                          View Game
                         </button>
-                      )}
+                        {address && game.creator.toLowerCase() !== address.toLowerCase() && (
+                          <button
+                            onClick={() => handleJoinGame(game.id)}
+                            disabled={joiningGameId === game.id}
+                            className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            {joiningGameId === game.id ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Joining...
+                              </>
+                            ) : (
+                              <>
+                                <Sword className="w-4 h-4" />
+                                Join Battle
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                       {address && game.creator.toLowerCase() === address.toLowerCase() && (
-                        <div className="w-full bg-blue-600/20 text-blue-400 text-center py-2 px-4 rounded-lg text-sm">
+                        <div className="w-full bg-blue-600/20 text-blue-400 text-center py-2 px-4 rounded-lg text-sm mt-2">
                           Your Game - Waiting for opponent
                         </div>
                       )}
@@ -392,6 +403,15 @@ export default function TradingCardBattle() {
                             </div>
                           </>
                         )}
+                      </div>
+                      <div className="mt-4">
+                        <button
+                          onClick={() => router.push(`/battles/${game.id}`)}
+                          className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View Game Details
+                        </button>
                       </div>
                     </div>
                   ))}
