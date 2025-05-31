@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 
 // This would be called periodically (via cron job or webhook) to process notifications
@@ -43,7 +44,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processVolumeSurgeNotifications(data: any) {
   const { collection, volume24h, threshold } = data;
   
@@ -83,11 +83,7 @@ async function processVolumeSurgeNotifications(data: any) {
     }
 
     // Send Telegram if enabled
-    if (subscriber.enableTelegram && subscriber.telegramChatId) {
-      // await sendTelegram(subscriber.telegramChatId, notification.message);
-      console.log(`Would send Telegram to ${subscriber.telegramChatId}: ${notification.message}`);
-    }
-
+   
     notificationsSent.push(notification);
   }
 
@@ -132,7 +128,6 @@ async function processSaleNotifications(data: any) {
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processOfferNotifications(data: any) {
   const { offerer, recipient, collection, tokenId, price } = data;
 
