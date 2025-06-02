@@ -7,7 +7,7 @@ export async function GET(
   try {
     const { slug } = await params;
     const response = await fetch(
-      `https://api.opensea.io/api/v2/offers/collection/${slug}/all`,
+      `https://api.opensea.io/api/v2/offers/collection/${slug}`,
       {
         headers: {
           'X-API-KEY': process.env.NEXT_PUBLIC_OPENSEA_API_KEY || '',

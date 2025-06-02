@@ -1,17 +1,18 @@
 'use client';
 
-import { Home, TrendingUp, Sword, Settings, Shield } from 'lucide-react';
+import { Home, TrendingUp, Sword, Settings, Shield, Gift } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { packBattlesABI } from '../../lib/abis/PackBattles';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x9b4568cE546c1c54f15720783FE1744C20fF1914';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home, description: 'Main dashboard' },
   { name: 'Battles', href: '/battles', icon: Sword, description: 'PvP Trading Card Battles' },
+  { name: 'WinBox', href: '/winbox', icon: Gift, description: 'Open packs and win NFTs' },
   { name: 'Collections', href: '/collections', icon: TrendingUp, description: 'Collect and manage your cards' },
   { name: 'Settings', href: '/settings', icon: Settings, description: 'Manage your account settings' },
 ];

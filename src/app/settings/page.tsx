@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
-import DashboardLayout from '../../components/dashboard/dashboard-layout';
 import { Bell, Phone, MessageCircle, Save, Plus, Trash2 } from 'lucide-react';
 
 interface Subscription {
@@ -115,7 +114,6 @@ export default function SettingsPage() {
   // Show loading state while Privy is initializing
   if (!ready) {
     return (
-      <DashboardLayout>
         <div className="p-6 bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
           <div className="animate-pulse">
             <div className="h-6 bg-gray-700 rounded mb-4 w-1/3"></div>
@@ -126,14 +124,12 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
   // Show login prompt if not authenticated
   if (!authenticated) {
     return (
-      <DashboardLayout>
         <div className="bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
           <div className="px-6 py-4 border-b border-red-900/30">
             <h1 className="text-2xl font-bold text-white">Notification Settings</h1>
@@ -144,13 +140,11 @@ export default function SettingsPage() {
             <p className="text-sm text-gray-500">Connect your wallet or sign in to get started</p>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
   if (loading) {
     return (
-      <DashboardLayout>
         <div className="p-6 bg-gradient-to-br from-gray-900 via-red-950/30 to-gray-900 rounded-lg shadow-2xl border border-red-900/30">
           <div className="animate-pulse">
             <div className="h-6 bg-gray-700 rounded mb-4 w-1/3"></div>
@@ -161,12 +155,10 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Page Header */}
         <div>
@@ -378,6 +370,5 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
-    </DashboardLayout>
   );
 } 

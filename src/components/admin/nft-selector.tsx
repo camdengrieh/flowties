@@ -8,7 +8,7 @@ import { Loader2, Plus, Check } from 'lucide-react';
 import { packBattlesABI } from '@/lib/abis/PackBattles';
 import { erc721Abi } from 'viem';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x9b4568cE546c1c54f15720783FE1744C20fF1914';
 
 interface NFTSelectorProps {
   collection: string;

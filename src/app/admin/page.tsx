@@ -5,7 +5,7 @@ import { useAccount, useReadContract } from 'wagmi';
 import { packBattlesABI } from '@/lib/abis/PackBattles';
 import AdminPanel from '@/components/dashboard/admin-panel';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x9b4568cE546c1c54f15720783FE1744C20fF1914';
 
 export default function AdminPage() {
   const { address } = useAccount();

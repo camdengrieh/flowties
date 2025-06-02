@@ -86,7 +86,7 @@ export default function Header() {
       <div className="h-14 px-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 bg-clip-text text-transparent">flowtis</h1>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-orange-400 via-red-400 to-orange-400 bg-clip-text text-transparent">FlipOrFlow</h1>
         </div>
 
         {/* Right side elements */}

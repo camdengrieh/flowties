@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Flowtis Dashboard",
+  title: "FlipOrFlow Dashboard",
   description: "Your personal dashboard powered by Privy",
 };
 

@@ -137,9 +137,9 @@ export default function MarketActivity() {
       
       try {
         const [bestListingsRes, allListingsRes, offersRes] = await Promise.all([
-          fetch(`/api/opensea/collection/${selectedCollection}/best-listings`),
+          fetch(`https://api.opensea.io/api/v2/listings/collection/${selectedCollection}/best`),
           fetch(`/api/opensea/collection/${selectedCollection}/all-listings`),
-          fetch(`/api/opensea/collection/${selectedCollection}/best-offers`)
+          fetch(`https://api.opensea.io/api/v2/offers/collection/${selectedCollection}/nfts/0/best`)
         ]);
 
         [listingsData, allListingsData, offersData] = await Promise.all([

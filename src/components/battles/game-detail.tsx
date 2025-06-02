@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Loader2, Trophy, Clock, ArrowLeft, User, Users, Play } from 'lucide-react';
-import { useReadContract, useAccount } from 'wagmi';
+import { Sparkles, Loader2, Trophy, Clock, ArrowLeft, User, Users, Play, Sword } from 'lucide-react';
+import { useReadContract, useWriteContract, useWatchContractEvent, useAccount } from 'wagmi';
 import { packBattlesABI } from '@/lib/abis/PackBattles';
 import DynamicBattleStage from './dynamic-battle-stage';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x9b4568cE546c1c54f15720783FE1744C20fF1914';
 
 interface Card {
   id: string;
@@ -43,6 +43,7 @@ export default function GameDetail({ gameId }: GameDetailProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showReplay, setShowReplay] = useState(false);
+  const [joiningGame, setJoiningGame] = useState(false);
 
   const gameIdNumber = parseInt(gameId);
 
@@ -52,9 +53,87 @@ export default function GameDetail({ gameId }: GameDetailProps) {
     abi: packBattlesABI,
     functionName: 'getGame',
     args: [BigInt(gameIdNumber)],
+    query: {
+      refetchInterval: 5000,
+    },
   });
 
+  // Read game fee for joining
+  const { data: gameFee } = useReadContract({
+    address: PACK_BATTLES_ADDRESS as `0x${string}`,
+    abi: packBattlesABI,
+    functionName: 'GAME_FEE',
+  });
+
+  // Contract write for joining game
+  const { writeContractAsync, isPending: isJoiningPack } = useWriteContract();
+
   const game = gameData as Game | undefined;
+
+  // Watch for GameJoined events
+  useWatchContractEvent({
+    address: PACK_BATTLES_ADDRESS as `0x${string}`,
+    abi: packBattlesABI,
+    eventName: 'GameJoined',
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const { args } = log;
+        if (args && args.gameId && Number(args.gameId) === gameIdNumber) {
+          // Game was joined, refresh will happen automatically due to refetchInterval
+          setJoiningGame(false);
+        }
+      });
+    },
+  });
+
+  // Watch for GameCompleted events
+  useWatchContractEvent({
+    address: PACK_BATTLES_ADDRESS as `0x${string}`,
+    abi: packBattlesABI,
+    eventName: 'GameCompleted',
+    onLogs: (logs) => {
+      logs.forEach((log) => {
+        const { args } = log;
+        if (args && args.gameId && Number(args.gameId) === gameIdNumber) {
+          // Game completed, battle results will be loaded automatically
+        }
+      });
+    },
+  });
+
+  // Join game function
+  const handleJoinGame = async () => {
+    if (!gameFee || !address || !game) return;
+
+    setJoiningGame(true);
+    try {
+      await writeContractAsync({
+        address: PACK_BATTLES_ADDRESS as `0x${string}`,
+        abi: packBattlesABI,
+        functionName: 'joinGame',
+        args: [BigInt(gameIdNumber)],
+        value: gameFee,
+      }, {
+        onSuccess: () => {
+        },
+        onError: () => {
+          setJoiningGame(false);
+        },
+      });
+    } catch (error) {
+      console.error('Failed to join game:', error);
+      setJoiningGame(false);
+    }
+  };
+
+  // Check if current user can join this game
+  const canJoinGame = () => {
+    if (!game || !address) return false;
+    if (game.isCompleted) return false;
+    if (game.player !== '0x0000000000000000000000000000000000000000') return false;
+    if (game.creator.toLowerCase() === address.toLowerCase()) return false;
+    return true;
+  };
 
   // Fetch battle results if game is completed
   useEffect(() => {
@@ -293,7 +372,7 @@ export default function GameDetail({ gameId }: GameDetailProps) {
               </div>
               <div>
                 <span className="text-gray-400">Total Prize Pool:</span>
-                <div className="text-green-400 font-semibold">2 FLOW</div>
+                <div className="text-green-400 font-semibold">2 Moment NFTs</div>
               </div>
               <div>
                 <span className="text-gray-400">Status:</span>
@@ -327,7 +406,34 @@ export default function GameDetail({ gameId }: GameDetailProps) {
 
           {/* Pending Animation */}
           {!game.isCompleted && (
-            <div className="text-center">
+            <div className="text-center space-y-4">
+              {/* Join Battle Button */}
+              {canJoinGame() && (
+                <div className="mb-6">
+                  <button
+                    onClick={handleJoinGame}
+                    disabled={joiningGame || isJoiningPack}
+                    className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg"
+                  >
+                    {joiningGame || isJoiningPack ? (
+                      <>
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span className="text-lg">Joining Battle...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sword className="w-6 h-6" />
+                        <span className="text-lg">Join Battle (1 FLOW)</span>
+                        <Sparkles className="w-6 h-6" />
+                      </>
+                    )}
+                  </button>
+                  <p className="text-gray-400 mt-3">
+                    Join this battle and compete for the prize pool!
+                  </p>
+                </div>
+              )}
+              
               <div className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-600/20 to-red-600/20 border border-orange-500/30 rounded-lg px-6 py-4">
                 <Loader2 className="w-6 h-6 animate-spin text-orange-400" />
                 <span className="text-white font-semibold">

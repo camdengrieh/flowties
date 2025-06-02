@@ -5,7 +5,7 @@ import { useAccount, useReadContract, useReadContracts, useWriteContract } from 
 import { packBattlesABI } from '@/lib/abis/PackBattles';
 import { Loader2, Users, Trophy, Clock, Sword } from 'lucide-react';
 
-const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0xD3Fdb6f8CCf2F789bCe0AD679397EC7d52656Ff8';
+const PACK_BATTLES_ADDRESS = process.env.NEXT_PUBLIC_PACK_BATTLES_ADDRESS || '0x9b4568cE546c1c54f15720783FE1744C20fF1914';
 
 interface Game {
   creator: string;

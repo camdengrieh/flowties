@@ -36,7 +36,7 @@ export default function SalesMarquee() {
       setSales((prevSales) => {
         const newSales = mapped.filter(sale => !prevSales.some(ps => ps.id === sale.id));
         const existingSales = mapped.filter(sale => prevSales.some(ps => ps.id === sale.id));
-        return [...newSales.map(s => ({ ...s, isNew: true })), ...existingSales].slice(0, 4);
+        return [...newSales.map(s => ({ ...s, isNew: true })), ...existingSales].slice(0, 6);
       });
       
       // Reset isNew flag after animation
@@ -52,9 +52,9 @@ export default function SalesMarquee() {
   if (!sales.length) return null;
 
   return (
-    <div className="bg-gradient-to-r from-black via-red-950/50 to-blue-950/50 border-b border-red-900/30 py-1 overflow-hidden">
-      <div className="mx-auto items-center px-2 sm:px-3 lg:px-5">
-        <div className="flex items-stretch gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x snap-mandatory min-w-0">
+    <div className="bg-gradient-to-r justify-center from-black via-red-950/50 to-blue-950/50 border-b border-red-900/30 py-1 overflow-hidden">
+      <div className="items-center m-1 px-1 sm:px-2 lg:px-3">
+        <div className="flex items-stretch gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory min-w-0">
           {sales.map((sale) => (
             <Link
               key={sale.id}
@@ -62,7 +62,7 @@ export default function SalesMarquee() {
                 ? `/nft/${encodeURIComponent(sale.collection.name || sale.collection.address)}/${encodeURIComponent(sale.tokenId)}`
                 : "#"
               }
-              className={`flex-none w-64 sm:w-72 rounded-lg border p-4 transition-all duration-500 hover:shadow-lg snap-start ${
+              className={`flex-none rounded-lg border p-2 transition-all duration-500 hover:shadow-lg snap-start ${
                 sale.isNew 
                   ? 'bg-gradient-to-br from-green-900/80 to-green-800/80 border-green-500/50 scale-105 shadow-green-500/25' 
                   : 'bg-gradient-to-br from-gray-900/80 to-gray-800/80 border-gray-700/50 hover:border-orange-500/50'
